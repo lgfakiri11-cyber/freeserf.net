@@ -559,7 +559,7 @@ namespace Freeserf.Render
             if (body >= 0)
             {
                 uint torsoSpriteIndexWithoutColor = TorsoOffset + (uint)body;
-                uint torsoSpriteIndex = torsoSpriteIndexWithoutColor + serf.Player * TorsoPlayerOffset;
+                uint torsoSpriteIndex = torsoSpriteIndexWithoutColor + PlayerInfo.GetColorIndex(game.GetPlayer(serf.Player).Color) * TorsoPlayerOffset;
 
                 // TODO: This commented if/else was added to avoid an exception. But since DrawAdditionalSerf is no longer called, it seems to be ok now.
                 //if (torsoSpriteInfos.ContainsKey(torsoSpriteIndexWithoutColor))

@@ -4588,7 +4588,7 @@ namespace Freeserf
 
                 if (!renderFlags.ContainsKey(flag))
                 {
-                    var renderFlag = new Render.RenderFlag(flag, renderView.GetLayer(Layer.Objects), renderView.SpriteFactory, renderView.DataSource);
+                    var renderFlag = new Render.RenderFlag(flag, PlayerInfo.GetColorIndex(GetPlayer(flag.Player).Color), renderView.GetLayer(Layer.Objects), renderView.SpriteFactory, renderView.DataSource);
 
                     renderFlag.Visible = true;
 

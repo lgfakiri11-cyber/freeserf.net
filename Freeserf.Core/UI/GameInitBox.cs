@@ -2225,6 +2225,48 @@ namespace Freeserf.UI
 
             if (cx < 8 + 32 && cy < 72) // click on face
             {
+if (gameType == GameType.Custom && playerIndex == 0)
+{
+    var colors = PlayerInfo.PlayerColors;
+    var oldColor = player.Color;
+
+    int currentColorIndex = -1;
+
+    for (int i = 0; i < colors.Length; ++i)
+    {
+        if (colors[i].Red == oldColor.Red &&
+            colors[i].Green == oldColor.Green &&
+            colors[i].Blue == oldColor.Blue)
+        {
+            currentColorIndex = i;
+            break;
+        }
+    }
+
+    int nextColorIndex = (currentColorIndex + 1) % colors.Length;
+    var nextColor = colors[nextColorIndex];
+
+    for (uint i = 1; i < ServerGameInfo.PlayerCount; ++i)
+    {
+        var otherPlayer = ServerGameInfo.GetPlayer(i);
+
+        if (otherPlayer == null)
+            continue;
+
+        if (otherPlayer.Color.Red == nextColor.Red &&
+            otherPlayer.Color.Green == nextColor.Green &&
+            otherPlayer.Color.Blue == nextColor.Blue)
+        {
+            otherPlayer.Color = oldColor;
+            break;
+        }
+    }
+
+    player.Color = nextColor;
+    SetRedraw();
+    return true;
+}
+
                 bool canNotChange = (playerIndex == 0 && gameType != GameType.AIvsAI) ||
                                     gameType == GameType.Mission ||
                                     gameType == GameType.Tutorial ||

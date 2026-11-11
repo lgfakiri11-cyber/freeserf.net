@@ -30,6 +30,7 @@ namespace Freeserf.Render
     internal class RenderFlag : RenderObject
     {
         readonly Flag flag = null;
+        readonly uint colorIndex;
         // sprite index 128-143 (16 sprites)
         static Position[] spriteOffsets = null;
         static Position[] shadowSpriteOffsets = null;
@@ -50,10 +51,11 @@ namespace Freeserf.Render
             -4,  4
         };
 
-        public RenderFlag(Flag flag, IRenderLayer renderLayer, ISpriteFactory spriteFactory, DataSource dataSource)
+        public RenderFlag(Flag flag, uint colorIndex, IRenderLayer renderLayer, ISpriteFactory spriteFactory, DataSource dataSource)
             : base(renderLayer, spriteFactory, dataSource)
         {
             this.flag = flag;
+            this.colorIndex = colorIndex;
             this.spriteFactory = spriteFactory;
 
             Initialize();
@@ -118,7 +120,7 @@ namespace Freeserf.Render
             uint offset = (tick >> 3) & 3;
             uint spriteIndex = 128u + offset;
 
-            uint flagSpriteIndex = spriteIndex + flag.Player * 16u; // player colors
+            uint flagSpriteIndex = spriteIndex + colorIndex * 16u; // player colors
 
             var renderPosition = map.CoordinateSpace.TileSpaceToViewSpace(position);
 

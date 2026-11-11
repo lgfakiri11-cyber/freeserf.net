@@ -73,6 +73,19 @@ namespace Freeserf
             new() {Red = 0xef, Green = 0xef, Blue = 0x8f}  // Yellow
         ];
 
+        internal static uint GetColorIndex(Color color)
+        {
+            for (uint i = 0; i < PlayerColors.Length; ++i)
+            {
+                if (PlayerColors[i].Red == color.Red &&
+                    PlayerColors[i].Green == color.Green &&
+                    PlayerColors[i].Blue == color.Blue)
+                    return i;
+            }
+
+            return 0u;
+        }
+
         public static PlayerInfo Create(uint playerIndex, PlayerFace character, uint intelligence, uint supplies, uint reproduction)
         {
             int colorIndex = character.GetColorIndex();
