@@ -73,8 +73,8 @@ namespace Freeserf
             new() {Red = 0xef, Green = 0xef, Blue = 0x8f}, // Yellow
             new() {Red = 0x30, Green = 0xcf, Blue = 0x40}, // Green
             new() {Red = 0xef, Green = 0x80, Blue = 0x20}, // Orange
-            new() {Red = 0xef, Green = 0xef, Blue = 0xef}, // White
-            new() {Red = 0x70, Green = 0x30, Blue = 0xcf}  // Indigo
+            new() {Red = 0x20, Green = 0x50, Blue = 0xef}, // Sapphire
+            new() {Red = 0x30, Green = 0x30, Blue = 0x30}  // Black
         ];
 
         internal static uint GetColorIndex(Color color)

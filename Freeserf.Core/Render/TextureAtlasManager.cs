@@ -207,7 +207,7 @@ namespace Freeserf.Render
 
             // as we use this texture atlas also for gui buildings we add the basic flag sprite as well (for each player color)
             // they can be found at index 128-131
-            for (i = 0; i < 4; ++i)
+            for (i = 0; i < PlayerInfo.PlayerColors.Length; ++i)
             {
                 var playerColor = PlayerInfo.PlayerColors[i];
                 var flagColor = new PixelColor()
@@ -254,7 +254,7 @@ namespace Freeserf.Render
 
             // torsos
             // all 4 player colors
-            for (uint c = 0; c < 4; ++c)
+            for (uint c = 0; c < (uint)PlayerInfo.PlayerColors.Length; ++c)
             {
                 var playerColor = PlayerInfo.PlayerColors[c];
                 var serfColor = new PixelColor()
@@ -270,7 +270,7 @@ namespace Freeserf.Render
                     sprite = data.GetSprite(Data.Resource.SerfTorso, serfTorsoSprite, serfColor);
 
                     if (sprite != null)
-                        AddSprite(atlasIndex, 1000u + c * 1000u + serfTorsoSprite, sprite);
+                        AddSprite(atlasIndex, 10000u + c * 10000u + serfTorsoSprite, sprite);
                 }
             }
 
@@ -321,7 +321,7 @@ namespace Freeserf.Render
                 }
 
                 // all 4 player colors
-                for (uint c = 0; c < 4; ++c)
+                for (uint c = 0; c < (uint)PlayerInfo.PlayerColors.Length; ++c)
                 {
                     var playerColor = PlayerInfo.PlayerColors[c];
                     var flagColor = new PixelColor()

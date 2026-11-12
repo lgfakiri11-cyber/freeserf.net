@@ -213,8 +213,8 @@ namespace Freeserf.Render
 
         Serf serf = null;
         const uint HeadOffset = 0u;
-        const uint TorsoOffset = 1000u;
-        const uint TorsoPlayerOffset = 1000u;
+        const uint TorsoOffset = 10000u;
+        const uint TorsoPlayerOffset = 10000u;
         const uint ShadowIndex = 5000u;
         static readonly Dictionary<uint, Position> torsoDeltas = new Dictionary<uint, Position>();
         static readonly Dictionary<uint, Rect> headSpriteInfos = new Dictionary<uint, Rect>();
