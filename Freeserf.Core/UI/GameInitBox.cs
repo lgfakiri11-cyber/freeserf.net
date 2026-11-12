@@ -330,7 +330,9 @@ namespace Freeserf.UI
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                 {
                     colorPaletteItems[i] = coloredRectFactory.Create(8, 8,
-                        paletteColors[i], (byte)(baseDisplayLayer + 5));
+                        new Render.Color(paletteColors[i].Red,
+                            paletteColors[i].Green, paletteColors[i].Blue),
+                        (byte)(baseDisplayLayer + 5));
                     colorPaletteItems[i].Layer = layer;
                 }
 
