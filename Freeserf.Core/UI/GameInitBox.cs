@@ -228,6 +228,10 @@ namespace Freeserf.UI
             readonly Render.ILayerSprite playerValueBox = null;
             readonly Render.ILayerSprite activationButton = null;
             readonly Render.ILayerSprite copyValuesButton = null;
+            readonly Render.IColoredRect colorPaletteButton = null;
+            readonly Render.IColoredRect[] colorPaletteItems = new Render.IColoredRect[8];
+            bool showColorPaletteButton = false;
+            bool colorPaletteVisible = false;
             readonly Render.IColoredRect suppliesValue = null;
             readonly Render.IColoredRect intelligenceValue = null;
             readonly Render.IColoredRect reproductionValue = null;
@@ -266,6 +270,29 @@ namespace Freeserf.UI
             }
 
 
+            public bool ShowColorPaletteButton
+            {
+                get => showColorPaletteButton;
+                set
+                {
+                    showColorPaletteButton = value;
+                    colorPaletteButton.Visible = visible && value && playerFace != PlayerFace.None;
+                    if (!value)
+                        ColorPaletteVisible = false;
+                }
+            }
+
+            public bool ColorPaletteVisible
+            {
+                get => colorPaletteVisible;
+                set
+                {
+                    colorPaletteVisible = value && showColorPaletteButton && playerFace != PlayerFace.None;
+                    for (int i = 0; i < colorPaletteItems.Length; ++i)
+                        colorPaletteItems[i].Visible = visible && colorPaletteVisible;
+                }
+            }
+
             public PlayerBox(Interface interf, byte baseDisplayLayer)
             {
                 var spriteFactory = interf.RenderView.SpriteFactory;
@@ -295,6 +322,18 @@ namespace Freeserf.UI
                 copyValuesButton = CreateSprite(spriteFactory, 8, 16, type, 308u, (byte)(baseDisplayLayer + 4));
                 copyValuesButton.Layer = layer;
 
+                colorPaletteButton = coloredRectFactory.Create(8, 8,
+                    new Render.Color(0xef, 0xef, 0x8f), (byte)(baseDisplayLayer + 4));
+                colorPaletteButton.Layer = layer;
+
+                var paletteColors = PlayerInfo.PlayerColors;
+                for (int i = 0; i < colorPaletteItems.Length; ++i)
+                {
+                    colorPaletteItems[i] = coloredRectFactory.Create(8, 8,
+                        paletteColors[i], (byte)(baseDisplayLayer + 5));
+                    colorPaletteItems[i].Layer = layer;
+                }
+
                 // max values for the values seem to be 40
                 suppliesValue = coloredRectFactory.Create(4, 40, new Render.Color(0x00, 0x93, 0x87), (byte)(baseDisplayLayer + 4));
                 intelligenceValue = coloredRectFactory.Create(4, 40, new Render.Color(0x6b, 0xab, 0x3b), (byte)(baseDisplayLayer + 4));
@@ -320,6 +359,9 @@ namespace Freeserf.UI
                     playerValueBox.Visible = visible;
                     activationButton.Visible = visible && showActivationButton;
                     copyValuesButton.Visible = visible && showCopyValueButton && playerFace != PlayerFace.None;
+                    colorPaletteButton.Visible = visible && showColorPaletteButton && playerFace != PlayerFace.None;
+                    for (int i = 0; i < colorPaletteItems.Length; ++i)
+                        colorPaletteItems[i].Visible = visible && colorPaletteVisible;
 
                     for (int i = 0; i < 5; ++i)
                         borders[i].Visible = visible;
@@ -348,6 +390,9 @@ namespace Freeserf.UI
                 playerValueBox.DisplayLayer = (byte)(displayLayer + 2);
                 activationButton.DisplayLayer = (byte)(displayLayer + 3);
                 copyValuesButton.DisplayLayer = (byte)(displayLayer + 4);
+                colorPaletteButton.DisplayLayer = (byte)(displayLayer + 4);
+                for (int i = 0; i < colorPaletteItems.Length; ++i)
+                    colorPaletteItems[i].DisplayLayer = (byte)(displayLayer + 5);
 
                 suppliesValue.DisplayLayer = (byte)(displayLayer + 4);
                 intelligenceValue.DisplayLayer = (byte)(displayLayer + 4);
@@ -366,6 +411,14 @@ namespace Freeserf.UI
                 SetChildPosition(baseX, baseY, x + 6, y + 8, playerValueBox);
                 SetChildPosition(baseX, baseY, x + 6, y + 8, activationButton);
                 SetChildPosition(baseX, baseY, x + 5, y + 8, copyValuesButton);
+
+                colorPaletteButton.X = this.x + 40;
+                colorPaletteButton.Y = this.y + 24;
+                for (int i = 0; i < colorPaletteItems.Length; ++i)
+                {
+                    colorPaletteItems[i].X = this.x + 40 + (i % 4) * 8;
+                    colorPaletteItems[i].Y = this.y + 32 + (i / 4) * 8;
+                }
 
                 SetChildPosition(baseX, baseY, x, y, borders[0]);
                 SetChildPosition(baseX, baseY, x, y + 72, borders[1]);
@@ -395,6 +448,8 @@ namespace Freeserf.UI
             public void SetPlayerFace(PlayerFace face)
             {
                 playerFace = face;
+                if (playerFace == PlayerFace.None)
+                    ColorPaletteVisible = false;
                 playerImage.TextureAtlasOffset = GetTextureAtlasOffset(Data.Resource.Icon, face.GetGraphicIndex());
 
                 if (playerFace == PlayerFace.None)
@@ -1108,6 +1163,9 @@ namespace Freeserf.UI
                         playerBoxes[i].SetPlayerValues(player.Supplies, player.Intelligence, player.Reproduction);
                     }
 
+                    playerBoxes[i].ShowColorPaletteButton =
+                        gameType == GameType.Custom && i == 0 &&
+                        i < ServerGameInfo.PlayerCount && ServerGameInfo.Players[i] != null;
                     playerBoxes[i].SetPosition(TotalX, TotalY, 10 * bx, 40 + by * 80);
                     playerBoxes[i].Visible = true;
                     playerBoxes[i].SetBaseDisplayLayer((byte)(BaseDisplayLayer + 1));
@@ -2221,6 +2279,51 @@ namespace Freeserf.UI
             if (player == null) // free slot in multiplayer
             {
                 return true;
+            }
+
+            if (gameType == GameType.Custom && playerIndex == 0)
+            {
+                if (playerBoxes[0].ColorPaletteVisible &&
+                    cx >= 40 && cx < 72 && cy >= 32 && cy < 48)
+                {
+                    int colorIndex = ((cy - 32) / 8) * 4 + (cx - 40) / 8;
+                    var colors = PlayerInfo.PlayerColors;
+
+                    if (colorIndex >= 0 && colorIndex < colors.Length)
+                    {
+                        var oldColor = player.Color;
+                        var selectedColor = colors[colorIndex];
+
+                        for (uint i = 1; i < ServerGameInfo.PlayerCount; ++i)
+                        {
+                            var otherPlayer = ServerGameInfo.GetPlayer(i);
+                            if (otherPlayer == null)
+                                continue;
+
+                            if (otherPlayer.Color.Red == selectedColor.Red &&
+                                otherPlayer.Color.Green == selectedColor.Green &&
+                                otherPlayer.Color.Blue == selectedColor.Blue)
+                            {
+                                otherPlayer.Color = oldColor;
+                                break;
+                            }
+                        }
+
+                        player.Color = selectedColor;
+                    }
+
+                    playerBoxes[0].ColorPaletteVisible = false;
+                    SetRedraw();
+                    return true;
+                }
+
+                if (cx >= 40 && cx < 48 && cy >= 24 && cy < 32)
+                {
+                    playerBoxes[0].ColorPaletteVisible =
+                        !playerBoxes[0].ColorPaletteVisible;
+                    SetRedraw();
+                    return true;
+                }
             }
 
             if (cx < 8 + 32 && cy < 72) // click on face
