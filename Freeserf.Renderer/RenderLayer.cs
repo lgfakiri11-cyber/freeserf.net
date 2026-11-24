@@ -113,17 +113,21 @@ namespace Freeserf.Renderer
 
             // Keep UI colors faithful. Push units and architecture harder than
             // terrain so workers, roofs, walls, trees and resources separate clearly.
-            float visualContrast = interfaceLayer ? 1.05f
-                : serfLayer ? 1.27f
-                : structureLayer ? 1.23f
-                : terrainLayer ? 1.18f
-                : 1.18f;
+            float visualContrast = interfaceLayer ? 1.06f
+                : serfLayer ? 1.42f
+                : Layer == Layer.Buildings ? 1.40f
+                : Layer == Layer.Objects ? 1.35f
+                : Layer == Layer.Paths ? 1.24f
+                : terrainLayer ? 1.27f
+                : 1.20f;
 
-            float visualSaturation = interfaceLayer ? 1.03f
-                : serfLayer ? 1.22f
-                : structureLayer ? 1.18f
-                : terrainLayer ? 1.13f
-                : 1.14f;
+            float visualSaturation = interfaceLayer ? 1.04f
+                : serfLayer ? 1.38f
+                : Layer == Layer.Buildings ? 1.34f
+                : Layer == Layer.Objects ? 1.30f
+                : Layer == Layer.Paths ? 1.16f
+                : terrainLayer ? 1.25f
+                : 1.16f;
 
             if (renderBufferColorRects != null)
             {

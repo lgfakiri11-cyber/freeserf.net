@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ master, feature/10-player-colors-ui ]
+    branches: [ master, feature/10-player-colors-ui, feature/s1-remaster-pixel-detail ]
   workflow_dispatch:
     inputs:
       release_tag:
