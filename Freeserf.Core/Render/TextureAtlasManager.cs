@@ -190,7 +190,7 @@ namespace Freeserf.Render
             // building sprites are located in sprites 144 to 193 (with some gaps)
             for (uint buildingSprite = 144; buildingSprite <= 193; ++buildingSprite)
             {
-                sprite = data.GetSprite(Data.Resource.MapObject, buildingSprite, color);
+                sprite = SpriteAssetOverrides.Apply(Data.Resource.MapObject, buildingSprite, data.GetSprite(Data.Resource.MapObject, buildingSprite, color));
 
                 if (sprite != null)
                     AddSprite(atlasIndex, buildingSprite, sprite);
@@ -297,7 +297,7 @@ namespace Freeserf.Render
             // sprites 0 - 127 are normal map objects
             for (uint objectSprite = 0; objectSprite < 128; ++objectSprite)
             {
-                sprite = data.GetSprite(Data.Resource.MapObject, objectSprite, color);
+                sprite = SpriteAssetOverrides.Apply(Data.Resource.MapObject, objectSprite, data.GetSprite(Data.Resource.MapObject, objectSprite, color));
 
                 if (sprite != null)
                     AddSprite(atlasIndex, objectSprite, sprite);
