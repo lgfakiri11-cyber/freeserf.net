@@ -98,18 +98,32 @@ namespace Freeserf.Renderer
             if (!Visible || texture == null)
                 return;
 
-            // Keep interface colors close to their authored palette while giving
-            // the game world a stronger, still pixel-art-friendly image.
+            // S1 Remaster visual profile: preserve the original pixel grid while
+            // giving terrain, structures and moving units distinct levels of clarity.
             bool interfaceLayer =
                 Layer == Layer.Gui ||
                 Layer == Layer.GuiBuildings ||
                 Layer == Layer.GuiFont ||
                 Layer == Layer.Cursor ||
                 Layer == Layer.Minimap;
-            // Serfs get a little extra local contrast and saturation so faces,
-            // clothing and team colors stay readable against busy terrain.
-            float visualContrast = interfaceLayer ? 1.05f : (Layer == Layer.Serfs ? 1.16f : 1.12f);
-            float visualSaturation = interfaceLayer ? 1.03f : (Layer == Layer.Serfs ? 1.11f : 1.09f);
+
+            bool terrainLayer = Layer == Layer.Landscape || Layer == Layer.Waves;
+            bool structureLayer = Layer == Layer.Buildings || Layer == Layer.Objects || Layer == Layer.Paths;
+            bool serfLayer = Layer == Layer.Serfs;
+
+            // Keep UI colors faithful. Push units and architecture harder than
+            // terrain so workers, roofs, walls, trees and resources separate clearly.
+            float visualContrast = interfaceLayer ? 1.05f
+                : serfLayer ? 1.27f
+                : structureLayer ? 1.23f
+                : terrainLayer ? 1.18f
+                : 1.18f;
+
+            float visualSaturation = interfaceLayer ? 1.03f
+                : serfLayer ? 1.22f
+                : structureLayer ? 1.18f
+                : terrainLayer ? 1.13f
+                : 1.14f;
 
             if (renderBufferColorRects != null)
             {
