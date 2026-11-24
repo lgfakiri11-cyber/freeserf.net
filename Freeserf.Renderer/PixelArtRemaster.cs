@@ -1,16 +1,22 @@
 /*
- * PixelArtRemaster.cs - Conservative pixel-art detail pass
+ * PixelArtRemaster.cs - S1 pixel-art enhancement pass
  *
- * This is an original runtime enhancement for freeserf.net. It does not
- * replace or redistribute any of the original game artwork.
+ * Original runtime processing only. It preserves source alpha and hard sprite
+ * silhouettes; it does not replace or redistribute original game artwork.
  */
 
 namespace Freeserf.Renderer
 {
     internal static class PixelArtRemaster
     {
-        // Edge-preserving micro-contrast. Neighbours across transparent gaps
-        // and strong colour boundaries are ignored to protect sprite outlines.
+        // 8-neighbour edge-aware sharpening. The static offsets avoid allocating
+        // a temporary neighbour array for every pixel on large Android atlases.
+        static readonly int[] NeighbourOffsets =
+        {
+            -4, 4, -1, 1,
+            -5, -3, 3, 5
+        };
+
         internal static void EnhanceRgba(byte[] pixels, int width, int height)
         {
             if (pixels == null || width < 3 || height < 3 ||
@@ -18,36 +24,34 @@ namespace Freeserf.Renderer
                 return;
 
             byte[] source = (byte[])pixels.Clone();
-            const float strength = 0.28f;
-            const int luminanceLimit = 44;
+
+            // Tuned for nearest-neighbour pixel art: visibly crisper, without
+            // ringing around black outlines or colour bleeding through alpha.
+            const float detailStrength = 0.42f;
+            const float colourStrength = 0.075f;
+            const int edgeLimit = 60;
 
             for (int y = 1; y < height - 1; y++)
             {
+                int row = y * width;
                 for (int x = 1; x < width - 1; x++)
                 {
-                    int p = (y * width + x) * 4;
+                    int p = (row + x) * 4;
                     if (source[p + 3] < 240)
                         continue;
 
-                    int[] neighbours =
-                    {
-                        p - 4, p + 4, p - width * 4, p + width * 4,
-                        p - width * 4 - 4, p - width * 4 + 4,
-                        p + width * 4 - 4, p + width * 4 + 4
-                    };
-
+                    int centerLuma = Luma(source[p], source[p + 1], source[p + 2]);
                     float sumR = 0, sumG = 0, sumB = 0;
                     int count = 0;
-                    int centerLuma = Luma(source[p], source[p + 1], source[p + 2]);
 
-                    for (int i = 0; i < neighbours.Length; i++)
+                    for (int i = 0; i < NeighbourOffsets.Length; i++)
                     {
-                        int n = neighbours[i];
+                        int n = p + NeighbourOffsets[i] * 4;
                         if (source[n + 3] < 240)
                             continue;
 
                         int neighbourLuma = Luma(source[n], source[n + 1], source[n + 2]);
-                        if (System.Math.Abs(centerLuma - neighbourLuma) > luminanceLimit)
+                        if (System.Math.Abs(centerLuma - neighbourLuma) > edgeLimit)
                             continue;
 
                         sumR += source[n];
@@ -56,25 +60,42 @@ namespace Freeserf.Renderer
                         count++;
                     }
 
-                    if (count < 2)
+                    if (count < 3)
                         continue;
 
-                    pixels[p] = Adjust(source[p], sumR / count, strength);
-                    pixels[p + 1] = Adjust(source[p + 1], sumG / count, strength);
-                    pixels[p + 2] = Adjust(source[p + 2], sumB / count, strength);
+                    float r = Sharpen(source[p], sumR / count, detailStrength);
+                    float g = Sharpen(source[p + 1], sumG / count, detailStrength);
+                    float b = Sharpen(source[p + 2], sumB / count, detailStrength);
+
+                    // Small vibrance lift, weighted toward muted colours. This
+                    // keeps vivid player colours and UI highlights from clipping.
+                    float luma = Luma(r, g, b);
+                    float saturation = (System.Math.Max(r, System.Math.Max(g, b)) -
+                                        System.Math.Min(r, System.Math.Min(g, b))) / 255.0f;
+                    float vibrance = colourStrength * (1.0f - saturation);
+
+                    pixels[p] = ClampByte(luma + (r - luma) * (1.0f + vibrance));
+                    pixels[p + 1] = ClampByte(luma + (g - luma) * (1.0f + vibrance));
+                    pixels[p + 2] = ClampByte(luma + (b - luma) * (1.0f + vibrance));
+                    // Alpha is intentionally never modified.
                 }
             }
         }
 
-        static int Luma(byte r, byte g, byte b)
+        static int Luma(float r, float g, float b)
         {
-            return (r * 77 + g * 150 + b * 29) >> 8;
+            return (int)((r * 77.0f + g * 150.0f + b * 29.0f) / 256.0f);
         }
 
-        static byte Adjust(byte center, float neighbourAverage, float strength)
+        static float Sharpen(byte center, float neighbourAverage, float strength)
         {
-            int value = (int)System.Math.Round(center + (center - neighbourAverage) * strength);
-            return (byte)System.Math.Max(0, System.Math.Min(255, value));
+            return center + (center - neighbourAverage) * strength;
+        }
+
+        static byte ClampByte(float value)
+        {
+            return (byte)System.Math.Max(0, System.Math.Min(255,
+                (int)System.Math.Round(value)));
         }
     }
 }
