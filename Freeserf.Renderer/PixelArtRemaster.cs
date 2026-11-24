@@ -27,9 +27,9 @@ namespace Freeserf.Renderer
 
             // Tuned for nearest-neighbour pixel art: visibly crisper, without
             // ringing around black outlines or colour bleeding through alpha.
-            const float detailStrength = 0.42f;
-            const float colourStrength = 0.075f;
-            const int edgeLimit = 60;
+            const float detailStrength = 0.62f;
+            const float colourStrength = 0.12f;
+            const int edgeLimit = 72;
 
             for (int y = 1; y < height - 1; y++)
             {
