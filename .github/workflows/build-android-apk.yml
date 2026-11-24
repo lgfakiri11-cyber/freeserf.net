@@ -35,7 +35,11 @@ jobs:
             echo "sdkmanager not found under $SDK_ROOT/cmdline-tools"
             exit 1
           fi
+          # sdkmanager exits successfully after accepting licenses; the yes process
+          # may receive SIGPIPE when sdkmanager closes stdin, so disable pipefail here.
+          set +o pipefail
           yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses
+          set -o pipefail
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Build Release APK (trimmed)
