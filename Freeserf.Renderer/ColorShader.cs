@@ -101,8 +101,8 @@ namespace Freeserf.Renderer
             $"{{",
             $"    vec3 enhancedColor = (pixelColor.rgb - vec3(0.5f)) * {DefaultVisualEnhancementName}.x + vec3(0.5f);",
             $"    float luminance = dot(enhancedColor, vec3(0.299f, 0.587f, 0.114f));",
-            $"    pixelColor.rgb = clamp(mix(vec3(luminance), enhancedColor, {DefaultVisualEnhancementName}.y), 0.0f, 1.0f);",
-            $"    {(HasGLFragColor() ? "gl_FragColor" : DefaultFragmentOutColorName)} = pixelColor;",
+            $"    vec3 finalColor = clamp(mix(vec3(luminance), enhancedColor, {DefaultVisualEnhancementName}.y), 0.0f, 1.0f);",
+            $"    {(HasGLFragColor() ? "gl_FragColor" : DefaultFragmentOutColorName)} = vec4(finalColor, pixelColor.a);",
             $"}}"
         };
 
