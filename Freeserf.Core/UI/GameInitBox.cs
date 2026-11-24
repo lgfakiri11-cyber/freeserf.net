@@ -293,6 +293,11 @@ namespace Freeserf.UI
                 }
             }
 
+            public void SetPlayerColor(Render.Color color)
+            {
+                colorPaletteButton.Color = new Render.Color(color.Red, color.Green, color.Blue);
+            }
+
             public PlayerBox(Interface interf, byte baseDisplayLayer)
             {
                 var spriteFactory = interf.RenderView.SpriteFactory;
@@ -1162,6 +1167,7 @@ namespace Freeserf.UI
                         var player = ServerGameInfo.GetPlayer((uint)i);
 
                         playerBoxes[i].SetPlayerFace(player.Face);
+                        playerBoxes[i].SetPlayerColor(player.Color);
                         playerBoxes[i].SetPlayerValues(player.Supplies, player.Intelligence, player.Reproduction);
                     }
 
