@@ -18,8 +18,8 @@ namespace Freeserf.Renderer
                 return;
 
             byte[] source = (byte[])pixels.Clone();
-            const float strength = 0.20f;
-            const int luminanceLimit = 36;
+            const float strength = 0.28f;
+            const int luminanceLimit = 44;
 
             for (int y = 1; y < height - 1; y++)
             {
@@ -31,7 +31,9 @@ namespace Freeserf.Renderer
 
                     int[] neighbours =
                     {
-                        p - 4, p + 4, p - width * 4, p + width * 4
+                        p - 4, p + 4, p - width * 4, p + width * 4,
+                        p - width * 4 - 4, p - width * 4 + 4,
+                        p + width * 4 - 4, p + width * 4 + 4
                     };
 
                     float sumR = 0, sumG = 0, sumB = 0;
