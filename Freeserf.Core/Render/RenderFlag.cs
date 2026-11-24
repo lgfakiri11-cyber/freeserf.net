@@ -35,6 +35,11 @@ namespace Freeserf.Render
         static Position[] spriteOffsets = null;
         static Position[] shadowSpriteOffsets = null;
         readonly ISprite[] resources = new ISprite[8];
+        readonly Resource.Type[] resourceTypes = new Resource.Type[]
+        {
+            Resource.Type.None, Resource.Type.None, Resource.Type.None, Resource.Type.None,
+            Resource.Type.None, Resource.Type.None, Resource.Type.None, Resource.Type.None
+        };
         readonly ISpriteFactory spriteFactory = null;
         static Rect[] resourceSpriteInfos = null;
         int maxBaseLine = int.MinValue;
@@ -153,12 +158,15 @@ namespace Freeserf.Render
             {
                 var resource = flag.GetResourceAtSlot(i);
 
-                if (resource == Resource.Type.None)
+                if (resource != resourceTypes[i])
                 {
                     resources[i]?.Delete();
                     resources[i] = null;
-                    continue;
+                    resourceTypes[i] = resource;
                 }
+
+                if (resource == Resource.Type.None)
+                    continue;
 
                 int baselineOffset = (i < 3) ? -2 : 2;
                 var info = resourceSpriteInfos[(int)resource];
