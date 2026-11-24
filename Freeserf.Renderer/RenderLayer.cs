@@ -106,8 +106,10 @@ namespace Freeserf.Renderer
                 Layer == Layer.GuiFont ||
                 Layer == Layer.Cursor ||
                 Layer == Layer.Minimap;
-            float visualContrast = interfaceLayer ? 1.05f : 1.12f;
-            float visualSaturation = interfaceLayer ? 1.03f : 1.09f;
+            // Serfs get a little extra local contrast and saturation so faces,
+            // clothing and team colors stay readable against busy terrain.
+            float visualContrast = interfaceLayer ? 1.05f : (Layer == Layer.Serfs ? 1.16f : 1.12f);
+            float visualSaturation = interfaceLayer ? 1.03f : (Layer == Layer.Serfs ? 1.11f : 1.09f);
 
             if (renderBufferColorRects != null)
             {
