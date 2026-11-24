@@ -424,7 +424,7 @@ namespace Freeserf.UI
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                 {
                     colorPaletteItems[i].X = this.x + 40 + (i % 5) * 8;
-                    colorPaletteItems[i].Y = this.y + 32 + (i / 5) * 8;
+                    colorPaletteItems[i].Y = this.y + 36 + (i / 5) * 8;
                 }
 
                 SetChildPosition(baseX, baseY, x, y, borders[0]);
@@ -2292,9 +2292,9 @@ namespace Freeserf.UI
             if (gameType == GameType.Custom && playerIndex == 0)
             {
                 if (playerBoxes[0].ColorPaletteVisible &&
-                    cx >= 40 && cx < 80 && cy >= 32 && cy < 48)
+                    cx >= 40 && cx < 80 && cy >= 36 && cy < 52)
                 {
-                    int colorIndex = ((cy - 32) / 8) * 5 + (cx - 40) / 8;
+                    int colorIndex = ((cy - 36) / 8) * 5 + (cx - 40) / 8;
                     var colors = PlayerInfo.PlayerColors;
 
                     if (colorIndex >= 0 && colorIndex < colors.Length)
