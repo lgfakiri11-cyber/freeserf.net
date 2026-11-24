@@ -591,6 +591,8 @@ namespace Freeserf.Render
             sprite.Y = renderPosition.Y + spriteOffsets[spriteIndex].Y;
             shadowSprite.X = renderPosition.X + shadowSpriteOffsets[spriteIndex].X;
             shadowSprite.Y = renderPosition.Y + shadowSpriteOffsets[spriteIndex].Y;
+            shadowSprite.BaseLineOffset =
+                sprite.Y + sprite.Height + sprite.BaseLineOffset - shadowSprite.Y - shadowSprite.Height - 1;
 
             if (frameSprite != null)
             {
@@ -603,6 +605,9 @@ namespace Freeserf.Render
                 {
                     frameShadowSprite.X = renderPosition.X + frameShadowSpriteOffsets[frameSpriteIndex].X;
                     frameShadowSprite.Y = renderPosition.Y + frameShadowSpriteOffsets[frameSpriteIndex].Y;
+                    frameShadowSprite.BaseLineOffset =
+                        frameSprite.Y + frameSprite.Height + frameSprite.BaseLineOffset -
+                        frameShadowSprite.Y - frameShadowSprite.Height - 1;
                 }
             }
 
