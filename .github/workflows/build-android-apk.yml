@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, feature/10-player-colors-ui ]
   workflow_dispatch:
     inputs:
       release_tag:
