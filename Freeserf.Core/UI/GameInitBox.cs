@@ -229,6 +229,7 @@ namespace Freeserf.UI
             readonly Render.ILayerSprite activationButton = null;
             readonly Render.ILayerSprite copyValuesButton = null;
             readonly Render.IColoredRect colorPaletteButton = null;
+            readonly Render.IColoredRect colorPaletteBackground = null;
             readonly Render.IColoredRect[] colorPaletteItems = new Render.IColoredRect[10];
             bool showColorPaletteButton = false;
             bool colorPaletteVisible = false;
@@ -288,6 +289,7 @@ namespace Freeserf.UI
                 set
                 {
                     colorPaletteVisible = value && showColorPaletteButton && playerFace != PlayerFace.None;
+                    colorPaletteBackground.Visible = visible && colorPaletteVisible;
                     for (int i = 0; i < colorPaletteItems.Length; ++i)
                         colorPaletteItems[i].Visible = visible && colorPaletteVisible;
                 }
@@ -331,6 +333,11 @@ namespace Freeserf.UI
                     new Render.Color(0xef, 0xef, 0x8f), (byte)(baseDisplayLayer + 4));
                 colorPaletteButton.Layer = layer;
 
+                // Dark backing keeps all ten color swatches distinct from the lobby background.
+                colorPaletteBackground = coloredRectFactory.Create(42, 18,
+                    new Render.Color(0x18, 0x20, 0x18), (byte)(baseDisplayLayer + 4));
+                colorPaletteBackground.Layer = layer;
+
                 var paletteColors = PlayerInfo.PlayerColors;
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                 {
@@ -367,6 +374,7 @@ namespace Freeserf.UI
                     activationButton.Visible = visible && showActivationButton;
                     copyValuesButton.Visible = visible && showCopyValueButton && playerFace != PlayerFace.None;
                     colorPaletteButton.Visible = visible && showColorPaletteButton && playerFace != PlayerFace.None;
+                    colorPaletteBackground.Visible = visible && colorPaletteVisible;
                     for (int i = 0; i < colorPaletteItems.Length; ++i)
                         colorPaletteItems[i].Visible = visible && colorPaletteVisible;
 
@@ -398,6 +406,7 @@ namespace Freeserf.UI
                 activationButton.DisplayLayer = (byte)(displayLayer + 3);
                 copyValuesButton.DisplayLayer = (byte)(displayLayer + 4);
                 colorPaletteButton.DisplayLayer = (byte)(displayLayer + 4);
+                colorPaletteBackground.DisplayLayer = (byte)(displayLayer + 4);
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                     colorPaletteItems[i].DisplayLayer = (byte)(displayLayer + 5);
 
@@ -421,6 +430,8 @@ namespace Freeserf.UI
 
                 colorPaletteButton.X = this.x + 40;
                 colorPaletteButton.Y = this.y + 24;
+                colorPaletteBackground.X = this.x + 39;
+                colorPaletteBackground.Y = this.y + 35;
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                 {
                     colorPaletteItems[i].X = this.x + 40 + (i % 5) * 8;
