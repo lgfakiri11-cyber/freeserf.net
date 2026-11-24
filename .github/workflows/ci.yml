@@ -235,3 +235,33 @@ jobs:
           fi
           gh release create "$TAG" --draft --title "$TAG" --notes-file release-notes.md \
             packages/Freeserf.net-Windows.zip packages/Freeserf.net-Linux.tar.gz packages/Freeserf.dmg
+
+  Android:
+    runs-on: ubuntu-latest
+    container:
+      image: conneqthub/dotnet-maui-android:latest
+
+    steps:
+      - name: Checkout Freeserf.net
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Android SDK platforms and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_SDK_ROOT:-/usr/lib/android-sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager not found under $SDK_ROOT/cmdline-tools"
+            exit 1
+          fi
+          # sdkmanager closes stdin after accepting licenses; yes may receive SIGPIPE.
+          set +o pipefail
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses
+          set -o pipefail
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Build Android APK
+        run: dotnet build FreeserfNet.Android/FreeserfNet.Android.csproj -f net10.0-android -c Release -p:AndroidPackageFormat=apk -p:PublishTrimmed=true

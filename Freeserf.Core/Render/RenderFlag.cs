@@ -35,6 +35,11 @@ namespace Freeserf.Render
         static Position[] spriteOffsets = null;
         static Position[] shadowSpriteOffsets = null;
         readonly ISprite[] resources = new ISprite[8];
+        readonly Resource.Type[] resourceTypes = new Resource.Type[]
+        {
+            Resource.Type.None, Resource.Type.None, Resource.Type.None, Resource.Type.None,
+            Resource.Type.None, Resource.Type.None, Resource.Type.None, Resource.Type.None
+        };
         readonly ISpriteFactory spriteFactory = null;
         static Rect[] resourceSpriteInfos = null;
         int maxBaseLine = int.MinValue;
@@ -143,43 +148,52 @@ namespace Freeserf.Render
 
             sprite.BaseLineOffset = maxBaseLine - baseLine;
 
-            // resources
+            // Keep the flag shadow on the ground and just behind the flag cloth.
+            shadowSprite.BaseLineOffset =
+                renderPosition.Y + maxBaseLine - 1 - shadowSprite.Y - shadowSprite.Height;
+
+            // Update resource sprites only when a slot changes. Recreating all eight
+            // sprites every frame caused avoidable allocations and flicker on mobile.
             for (int i = 0; i < 8; ++i)
             {
                 var resource = flag.GetResourceAtSlot(i);
 
-                if (resource != Resource.Type.None)
-                {
-                    int baselineOffset = (i < 3) ? -2 : 2;
-                    var info = resourceSpriteInfos[(int)resource];
-
-                    var spriteOffset = textureAtlas.GetOffset(2000u + (uint)resource);
-                    resources[i]?.Delete();
-                    resources[i] = spriteFactory.Create(info.Size.Width, info.Size.Height, spriteOffset.X, spriteOffset.Y, false, false);
-
-                    // resource at slot 2 may be hidden by castle/stock so adjust baseline in this case
-                    if (i == 2 && flag.HasBuilding)
-                    {
-                        switch (flag.Building.BuildingType)
-                        {
-                            case Building.Type.Castle:
-                            case Building.Type.Stock:
-                                baselineOffset += 4;
-                                break;
-                        }
-                    }
-
-                    resources[i].X = renderPosition.X + info.Position.X + ResPos[i * 2];
-                    resources[i].Y = renderPosition.Y + info.Position.Y + ResPos[i * 2 + 1];
-                    resources[i].Layer = sprite.Layer;
-                    resources[i].BaseLineOffset = baselineOffset;
-                    resources[i].Visible = true;
-                }
-                else
+                if (resource != resourceTypes[i])
                 {
                     resources[i]?.Delete();
                     resources[i] = null;
+                    resourceTypes[i] = resource;
                 }
+
+                if (resource == Resource.Type.None)
+                    continue;
+
+                int baselineOffset = (i < 3) ? -2 : 2;
+                var info = resourceSpriteInfos[(int)resource];
+
+                if (resources[i] == null)
+                {
+                    var spriteOffset = textureAtlas.GetOffset(2000u + (uint)resource);
+                    resources[i] = spriteFactory.Create(info.Size.Width, info.Size.Height, spriteOffset.X, spriteOffset.Y, false, false);
+                }
+
+                // resource at slot 2 may be hidden by castle/stock so adjust baseline in this case
+                if (i == 2 && flag.HasBuilding)
+                {
+                    switch (flag.Building.BuildingType)
+                    {
+                        case Building.Type.Castle:
+                        case Building.Type.Stock:
+                            baselineOffset += 4;
+                            break;
+                    }
+                }
+
+                resources[i].X = renderPosition.X + info.Position.X + ResPos[i * 2];
+                resources[i].Y = renderPosition.Y + info.Position.Y + ResPos[i * 2 + 1];
+                resources[i].Layer = sprite.Layer;
+                resources[i].BaseLineOffset = baselineOffset;
+                resources[i].Visible = true;
             }
         }
     }

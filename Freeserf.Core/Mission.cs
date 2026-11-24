@@ -67,14 +67,16 @@ namespace Freeserf
 
         internal static readonly Color[] PlayerColors =
         [
-            new() {Red = 0x00, Green = 0xe3, Blue = 0xe3}, // Blue
+            new() {Red = 0x00, Green = 0xe3, Blue = 0xe3}, // Cyan
             new() {Red = 0xcf, Green = 0x63, Blue = 0x63}, // Red
             new() {Red = 0xdf, Green = 0x7f, Blue = 0xef}, // Magenta
             new() {Red = 0xef, Green = 0xef, Blue = 0x8f}, // Yellow
             new() {Red = 0x30, Green = 0xcf, Blue = 0x40}, // Green
             new() {Red = 0xef, Green = 0x80, Blue = 0x20}, // Orange
             new() {Red = 0x20, Green = 0x50, Blue = 0xef}, // Sapphire
-            new() {Red = 0x30, Green = 0x30, Blue = 0x30}  // Black
+            new() {Red = 0x30, Green = 0x30, Blue = 0x30}, // Black
+            new() {Red = 0x8b, Green = 0x5a, Blue = 0x2b}, // Brown
+            new() {Red = 0xf0, Green = 0xf0, Blue = 0xf0}  // White
         ];
 
         internal static uint GetColorIndex(Color color)

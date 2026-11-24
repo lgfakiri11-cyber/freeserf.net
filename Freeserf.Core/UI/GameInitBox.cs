@@ -229,7 +229,7 @@ namespace Freeserf.UI
             readonly Render.ILayerSprite activationButton = null;
             readonly Render.ILayerSprite copyValuesButton = null;
             readonly Render.IColoredRect colorPaletteButton = null;
-            readonly Render.IColoredRect[] colorPaletteItems = new Render.IColoredRect[8];
+            readonly Render.IColoredRect[] colorPaletteItems = new Render.IColoredRect[10];
             bool showColorPaletteButton = false;
             bool colorPaletteVisible = false;
             readonly Render.IColoredRect suppliesValue = null;
@@ -293,6 +293,11 @@ namespace Freeserf.UI
                 }
             }
 
+            public void SetPlayerColor(Freeserf.Color color)
+            {
+                colorPaletteButton.Color = new Render.Color(color.Red, color.Green, color.Blue);
+            }
+
             public PlayerBox(Interface interf, byte baseDisplayLayer)
             {
                 var spriteFactory = interf.RenderView.SpriteFactory;
@@ -322,7 +327,7 @@ namespace Freeserf.UI
                 copyValuesButton = CreateSprite(spriteFactory, 8, 16, type, 308u, (byte)(baseDisplayLayer + 4));
                 copyValuesButton.Layer = layer;
 
-                colorPaletteButton = coloredRectFactory.Create(8, 8,
+                colorPaletteButton = coloredRectFactory.Create(12, 10,
                     new Render.Color(0xef, 0xef, 0x8f), (byte)(baseDisplayLayer + 4));
                 colorPaletteButton.Layer = layer;
 
@@ -418,8 +423,8 @@ namespace Freeserf.UI
                 colorPaletteButton.Y = this.y + 24;
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                 {
-                    colorPaletteItems[i].X = this.x + 40 + (i % 4) * 8;
-                    colorPaletteItems[i].Y = this.y + 32 + (i / 4) * 8;
+                    colorPaletteItems[i].X = this.x + 40 + (i % 5) * 8;
+                    colorPaletteItems[i].Y = this.y + 36 + (i / 5) * 8;
                 }
 
                 SetChildPosition(baseX, baseY, x, y, borders[0]);
@@ -1162,6 +1167,7 @@ namespace Freeserf.UI
                         var player = ServerGameInfo.GetPlayer((uint)i);
 
                         playerBoxes[i].SetPlayerFace(player.Face);
+                        playerBoxes[i].SetPlayerColor(player.Color);
                         playerBoxes[i].SetPlayerValues(player.Supplies, player.Intelligence, player.Reproduction);
                     }
 
@@ -2210,7 +2216,7 @@ namespace Freeserf.UI
             if (loadedGame != null && gameType == GameType.MultiplayerServer)
                 return true;
 
-            if (cx < 8 || cx > 8 + 64 || cy < 8 || cy > 76)
+            if (cx < 8 || cx >= 80 || cy < 8 || cy > 76)
             {
                 return false;
             }
@@ -2286,9 +2292,9 @@ namespace Freeserf.UI
             if (gameType == GameType.Custom && playerIndex == 0)
             {
                 if (playerBoxes[0].ColorPaletteVisible &&
-                    cx >= 40 && cx < 72 && cy >= 32 && cy < 48)
+                    cx >= 40 && cx < 80 && cy >= 36 && cy < 52)
                 {
-                    int colorIndex = ((cy - 32) / 8) * 4 + (cx - 40) / 8;
+                    int colorIndex = ((cy - 36) / 8) * 5 + (cx - 40) / 8;
                     var colors = PlayerInfo.PlayerColors;
 
                     if (colorIndex >= 0 && colorIndex < colors.Length)
@@ -2319,7 +2325,7 @@ namespace Freeserf.UI
                     return true;
                 }
 
-                if (cx >= 40 && cx < 48 && cy >= 24 && cy < 32)
+                if (cx >= 40 && cx < 52 && cy >= 24 && cy < 34)
                 {
                     playerBoxes[0].ColorPaletteVisible =
                         !playerBoxes[0].ColorPaletteVisible;

@@ -118,6 +118,8 @@ namespace Freeserf.Render
             sprite.Y = renderPosition.Y + spriteOffsets[spriteIndex].Y;
             shadowSprite.X = renderPosition.X + shadowSpriteOffsets[spriteIndex].X;
             shadowSprite.Y = renderPosition.Y + shadowSpriteOffsets[spriteIndex].Y;
+            shadowSprite.BaseLineOffset =
+                sprite.Y + sprite.Height + sprite.BaseLineOffset - shadowSprite.Y - shadowSprite.Height - 1;
 
             sprite.TextureAtlasOffset = textureAtlas.GetOffset(spriteIndex);
             shadowSprite.TextureAtlasOffset = textureAtlas.GetOffset(1000u + spriteIndex);

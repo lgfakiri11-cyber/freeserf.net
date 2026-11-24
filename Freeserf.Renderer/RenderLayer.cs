@@ -98,11 +98,39 @@ namespace Freeserf.Renderer
             if (!Visible || texture == null)
                 return;
 
+            // S1 Remaster visual profile: preserve the original pixel grid while
+            // giving terrain, structures and moving units distinct levels of clarity.
+            bool interfaceLayer =
+                Layer == Layer.Gui ||
+                Layer == Layer.GuiBuildings ||
+                Layer == Layer.GuiFont ||
+                Layer == Layer.Cursor ||
+                Layer == Layer.Minimap;
+
+            bool terrainLayer = Layer == Layer.Landscape || Layer == Layer.Waves;
+            bool structureLayer = Layer == Layer.Buildings || Layer == Layer.Objects || Layer == Layer.Paths;
+            bool serfLayer = Layer == Layer.Serfs;
+
+            // Keep UI colors faithful. Push units and architecture harder than
+            // terrain so workers, roofs, walls, trees and resources separate clearly.
+            float visualContrast = interfaceLayer ? 1.05f
+                : serfLayer ? 1.27f
+                : structureLayer ? 1.23f
+                : terrainLayer ? 1.18f
+                : 1.18f;
+
+            float visualSaturation = interfaceLayer ? 1.03f
+                : serfLayer ? 1.22f
+                : structureLayer ? 1.18f
+                : terrainLayer ? 1.13f
+                : 1.14f;
+
             if (renderBufferColorRects != null)
             {
                 var colorShader = ColorShader.Instance;
 
                 colorShader.UpdateMatrices(SupportZoom);
+                colorShader.SetVisualEnhancement(visualContrast, visualSaturation);
                 colorShader.SetZ(Global.LayerBaseZ[layerIndex]);
 
                 renderBufferColorRects.Render();
@@ -123,6 +151,7 @@ namespace Freeserf.Renderer
             }
 
             shader.UpdateMatrices(SupportZoom);
+            shader.SetVisualEnhancement(visualContrast, visualSaturation);
 
             shader.SetSampler(0); // we use texture unit 0 -> see Gl.ActiveTexture below
             State.Gl.ActiveTexture(GLEnum.Texture0);

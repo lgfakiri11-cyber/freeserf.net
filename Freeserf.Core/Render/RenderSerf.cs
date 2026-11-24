@@ -221,6 +221,7 @@ namespace Freeserf.Render
         static readonly Dictionary<uint, Rect> torsoSpriteInfos = new Dictionary<uint, Rect>();
         static Rect shadowSpriteInfo = null;
         ISprite headSprite = null;
+        ISprite contactShadowSprite = null;
         DataSource dataSource = null;
         Audio.Audio audio = null;
         ISprite fightingFlash = null;
@@ -248,6 +249,7 @@ namespace Freeserf.Render
             Initialize();
 
             headSprite.Layer = sprite.Layer;
+            contactShadowSprite.Layer = sprite.Layer;
 
             InitOffsets(dataSource);
 
@@ -264,6 +266,9 @@ namespace Freeserf.Render
 
                 if (headSprite != null)
                     headSprite.Visible = value;
+
+                if (contactShadowSprite != null)
+                    contactShadowSprite.Visible = value;
             }
         }
 
@@ -273,6 +278,9 @@ namespace Freeserf.Render
 
             headSprite?.Delete();
             headSprite = null;
+
+            contactShadowSprite?.Delete();
+            contactShadowSprite = null;
 
             fightingEnemy?.Delete();
             fightingEnemy = null;
@@ -316,6 +324,7 @@ namespace Freeserf.Render
             sprite = spriteFactory.Create(0, 0, 0, 0, false, false);
             shadowSprite = spriteFactory.Create(0, 0, 0, 0, false, false);
             headSprite = spriteFactory.Create(0, 0, 0, 0, false, false);
+            contactShadowSprite = spriteFactory.Create(0, 0, 0, 0, false, false);
         }
 
         public int GetHeadSprite(ref int body)
@@ -509,6 +518,7 @@ namespace Freeserf.Render
                         sprite.Visible = false;
                         headSprite.Visible = false;
                         shadowSprite.Visible = false;
+                        contactShadowSprite.Visible = false;
 
                         return;
                     }
@@ -520,6 +530,7 @@ namespace Freeserf.Render
                         sprite.Visible = false;
                         headSprite.Visible = false;
                         shadowSprite.Visible = false;
+                        contactShadowSprite.Visible = false;
                         return;
                     }
 
@@ -572,14 +583,38 @@ namespace Freeserf.Render
                     sprite.TextureAtlasOffset = textureAtlas.GetOffset(torsoSpriteIndex);
                     sprite.BaseLineOffset = baseLineOffset;
 
+                    // Draw the original soft ground shadow beneath each visible serf.
+                    // Keep it just behind the body in the depth sort so it never covers the sprite.
+                    shadowSprite.X = x + shadowSpriteInfo.Position.X;
+                    shadowSprite.Y = y + shadowSpriteInfo.Position.Y;
+                    shadowSprite.Resize(shadowSpriteInfo.Size.Width, shadowSpriteInfo.Size.Height);
+                    shadowSprite.TextureAtlasOffset = textureAtlas.GetOffset(ShadowIndex);
+                    shadowSprite.BaseLineOffset =
+                        sprite.Y + sprite.Height + sprite.BaseLineOffset -
+                        shadowSprite.Y - shadowSprite.Height - 1;
+
+                    shadowSprite.Visible = true;
+
+                    // A smaller second pass concentrates the soft shadow directly
+                    // beneath the serf's feet, adding contact depth without changing
+                    // the original Settlers sprite artwork.
+                    int contactShadowWidth = Math.Max(1, (int)(shadowSpriteInfo.Size.Width * 0.68f));
+                    int contactShadowHeight = Math.Max(1, (int)(shadowSpriteInfo.Size.Height * 0.58f));
+                    contactShadowSprite.X = shadowSprite.X + (shadowSprite.Width - contactShadowWidth) / 2;
+                    contactShadowSprite.Y = shadowSprite.Y + shadowSprite.Height - contactShadowHeight;
+                    contactShadowSprite.Resize(contactShadowWidth, contactShadowHeight);
+                    contactShadowSprite.TextureAtlasOffset = textureAtlas.GetOffset(ShadowIndex);
+                    contactShadowSprite.BaseLineOffset = shadowSprite.BaseLineOffset + 1;
+                    contactShadowSprite.Visible = true;
+
                     sprite.Visible = true;
-                    shadowSprite.Visible = true; // TODO
                 }
                 /*else
                 {
                     head = -1;
                     sprite.Visible = false;
                     shadowSprite.Visible = false; // TODO
+                contactShadowSprite.Visible = false;
                 }*/
             }
             else

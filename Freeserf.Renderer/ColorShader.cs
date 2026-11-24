@@ -31,6 +31,7 @@ namespace Freeserf.Renderer
         internal static readonly string DefaultColorName = "color";
         internal static readonly string DefaultZName = "z";
         internal static readonly string DefaultLayerName = "layer";
+        internal static readonly string DefaultVisualEnhancementName = "visualEnhancement";
 
         internal ShaderProgram shaderProgram;
         readonly string fragmentOutColorName;
@@ -93,11 +94,15 @@ namespace Freeserf.Renderer
         static readonly string[] ColorFragmentShader = new string[]
         {
             GetFragmentShaderHeader(),
+            $"uniform vec2 {DefaultVisualEnhancementName};",
             $"flat {GetInName(true)} vec4 pixelColor;",
             $"",
             $"void main()",
             $"{{",
-            $"    {(HasGLFragColor() ? "gl_FragColor" : DefaultFragmentOutColorName)} = pixelColor;",
+            $"    vec3 enhancedColor = (pixelColor.rgb - vec3(0.5f)) * {DefaultVisualEnhancementName}.x + vec3(0.5f);",
+            $"    float luminance = dot(enhancedColor, vec3(0.299f, 0.587f, 0.114f));",
+            $"    vec3 finalColor = clamp(mix(vec3(luminance), enhancedColor, {DefaultVisualEnhancementName}.y), 0.0f, 1.0f);",
+            $"    {(HasGLFragColor() ? "gl_FragColor" : DefaultFragmentOutColorName)} = vec4(finalColor, pixelColor.a);",
             $"}}"
         };
 
@@ -169,6 +174,11 @@ namespace Freeserf.Renderer
         public void SetZ(float z)
         {
             shaderProgram.SetInput(zName, z);
+        }
+
+        public void SetVisualEnhancement(float contrast, float saturation)
+        {
+            shaderProgram.SetInputVector2(DefaultVisualEnhancementName, contrast, saturation);
         }
 
         public static ColorShader Instance
