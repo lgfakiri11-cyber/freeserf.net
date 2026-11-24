@@ -2216,7 +2216,7 @@ namespace Freeserf.UI
             if (loadedGame != null && gameType == GameType.MultiplayerServer)
                 return true;
 
-            if (cx < 8 || cx > 8 + 64 || cy < 8 || cy > 76)
+            if (cx < 8 || cx >= 80 || cy < 8 || cy > 76)
             {
                 return false;
             }
