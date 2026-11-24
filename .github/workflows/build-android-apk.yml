@@ -26,7 +26,17 @@ jobs:
           submodules: recursive
 
       - name: Install Android SDK platforms and build tools
-        run: dotnet build FreeserfNet.Android/FreeserfNet.Android.csproj -t:InstallAndroidDependencies -f net10.0-android -p:AndroidSdkDirectory=/usr/lib/android-sdk -p:AcceptAndroidSdkLicenses=true
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_SDK_ROOT:-/usr/lib/android-sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager not found under $SDK_ROOT/cmdline-tools"
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Build Release APK (trimmed)
         run: dotnet build FreeserfNet.Android/FreeserfNet.Android.csproj -f net10.0-android -c Release -p:AndroidPackageFormat=apk -p:PublishTrimmed=true
