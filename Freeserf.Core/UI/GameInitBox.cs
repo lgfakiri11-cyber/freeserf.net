@@ -334,7 +334,7 @@ namespace Freeserf.UI
                 colorPaletteButton.Layer = layer;
 
                 // Dark backing keeps all ten color swatches distinct from the lobby background.
-                colorPaletteBackground = coloredRectFactory.Create(42, 18,
+                colorPaletteBackground = coloredRectFactory.Create(42, 32,
                     new Render.Color(0x18, 0x20, 0x18), (byte)(baseDisplayLayer + 4));
                 colorPaletteBackground.Layer = layer;
 
@@ -434,8 +434,8 @@ namespace Freeserf.UI
                 colorPaletteBackground.Y = this.y + 35;
                 for (int i = 0; i < colorPaletteItems.Length; ++i)
                 {
-                    colorPaletteItems[i].X = this.x + 40 + (i % 5) * 8;
-                    colorPaletteItems[i].Y = this.y + 36 + (i / 5) * 8;
+                    colorPaletteItems[i].X = this.x + 40 + (i % 4) * 10;
+                    colorPaletteItems[i].Y = this.y + 36 + (i / 4) * 10;
                 }
 
                 SetChildPosition(baseX, baseY, x, y, borders[0]);
@@ -2303,12 +2303,16 @@ namespace Freeserf.UI
             if (gameType == GameType.Custom && playerIndex == 0)
             {
                 if (playerBoxes[0].ColorPaletteVisible &&
-                    cx >= 40 && cx < 80 && cy >= 36 && cy < 52)
+                    cx >= 40 && cx < 80 && cy >= 36 && cy < 66)
                 {
-                    int colorIndex = ((cy - 36) / 8) * 5 + (cx - 40) / 8;
+                    int paletteColumn = (cx - 40) / 10;
+                    int paletteRow = (cy - 36) / 10;
+                    int colorIndex = paletteRow * 4 + paletteColumn;
+                    bool clickedSwatch = paletteColumn < 4 && paletteRow < 3 &&
+                        (cx - 40) % 10 < 8 && (cy - 36) % 10 < 8;
                     var colors = PlayerInfo.PlayerColors;
 
-                    if (colorIndex >= 0 && colorIndex < colors.Length)
+                    if (clickedSwatch && colorIndex >= 0 && colorIndex < colors.Length)
                     {
                         var oldColor = player.Color;
                         var selectedColor = colors[colorIndex];
