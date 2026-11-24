@@ -103,6 +103,7 @@ namespace Freeserf.Renderer
                 var colorShader = ColorShader.Instance;
 
                 colorShader.UpdateMatrices(SupportZoom);
+                colorShader.SetVisualEnhancement(1.06f, 1.05f);
                 colorShader.SetZ(Global.LayerBaseZ[layerIndex]);
 
                 renderBufferColorRects.Render();
@@ -123,6 +124,7 @@ namespace Freeserf.Renderer
             }
 
             shader.UpdateMatrices(SupportZoom);
+            shader.SetVisualEnhancement(1.06f, 1.05f);
 
             shader.SetSampler(0); // we use texture unit 0 -> see Gl.ActiveTexture below
             State.Gl.ActiveTexture(GLEnum.Texture0);
