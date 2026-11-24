@@ -572,8 +572,18 @@ namespace Freeserf.Render
                     sprite.TextureAtlasOffset = textureAtlas.GetOffset(torsoSpriteIndex);
                     sprite.BaseLineOffset = baseLineOffset;
 
+                    // Draw the original soft ground shadow beneath each visible serf.
+                    // Keep it just behind the body in the depth sort so it never covers the sprite.
+                    shadowSprite.X = x + shadowSpriteInfo.Position.X;
+                    shadowSprite.Y = y + shadowSpriteInfo.Position.Y;
+                    shadowSprite.Resize(shadowSpriteInfo.Size.Width, shadowSpriteInfo.Size.Height);
+                    shadowSprite.TextureAtlasOffset = textureAtlas.GetOffset(ShadowIndex);
+                    shadowSprite.BaseLineOffset =
+                        sprite.Y + sprite.Height + sprite.BaseLineOffset -
+                        shadowSprite.Y - shadowSprite.Height - 1;
+
+                    shadowSprite.Visible = true;
                     sprite.Visible = true;
-                    shadowSprite.Visible = true; // TODO
                 }
                 /*else
                 {
