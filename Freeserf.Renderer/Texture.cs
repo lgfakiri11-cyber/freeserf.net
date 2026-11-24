@@ -147,6 +147,11 @@ namespace Freeserf.Renderer
                 format = PixelFormat.RGB8;
             }
 
+            // Apply a restrained, edge-preserving detail pass to RGBA sprite atlases.
+            // Transparent sprite gaps and strong colour boundaries are protected.
+            if (format == PixelFormat.RGBA8 && Width >= 64 && Height >= 64)
+                PixelArtRemaster.EnhanceRgba(pixelData, Width, Height);
+
             Bind();
 
             var minMode = (numMipMapLevels > 0) ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest;
