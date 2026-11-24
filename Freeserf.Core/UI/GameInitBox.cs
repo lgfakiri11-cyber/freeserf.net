@@ -293,7 +293,7 @@ namespace Freeserf.UI
                 }
             }
 
-            public void SetPlayerColor(Render.Color color)
+            public void SetPlayerColor(Freeserf.Color color)
             {
                 colorPaletteButton.Color = new Render.Color(color.Red, color.Green, color.Blue);
             }
