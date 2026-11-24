@@ -6,6 +6,7 @@
  * Original sprite metadata (offsets/baselines) remains authoritative in DataSource.
  */
 using Freeserf.Data;
+using Data = Freeserf.Data.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
